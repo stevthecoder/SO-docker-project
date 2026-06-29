@@ -1,0 +1,42 @@
+services:
+  # Serviço da aplicação Node.js
+  web:
+    build: ./app
+    container_name: so-web-app
+    ports:
+      - "3000:3000"
+    environment:
+      - ALUNO=${ALUNO}
+      - PORT=${PORT}
+    mem_limit: 128m
+    networks:
+      - so-network
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  # Serviço do banco de dados MySQL
+  db:
+    image: mysql:8.0
+    container_name: so-mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - so-db-volume:/var/lib/mysql
+    mem_limit: 128m
+    networks:
+      - so-network
+    restart: unless-stopped
+
+# Rede Docker dedicada
+networks:
+  so-network:
+    driver: bridge
+
+# Volume persistente para o banco de dados
+volumes:
+  so-db-volume:
+    driver: local
